@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Vehicle = mongoose.model('Vehicle');
 
 const multer = require('multer');
+const reservationController = require('../controllers/reservation.controller');
 const upload = multer({ dest: 'uploads/' });
 
 //add vehicle
@@ -54,18 +55,29 @@ module.exports.editVehicle = (req, res, next) => {
     });
 }
 
-module.exports.getAll = (req, res, next) => {
-    let page = req.query.page;
-    let limit = req.query.limit;
+module.exports.getAll = async (req, res, next) => {
+    //let page = req.query.page;
+    //let limit = req.query.limit;
 
+    let f = await reservationController.getReservationsByDate(req.body.from, req.body.to);
+    let vehicles = []
+    f.forEach(v => {
+        vehicles.push(v.vehicle)
+    })
+    console.log(vehicles)
     Vehicle.find({
-        reservation: {
-            
-            to : {$gt : Date.now()}
-        }
+        _id: { $nin: vehicles }
     }, (err, val) => {
         res.json(val);
     })
+}
+
+
+module.exports.getVehicleById = async (req, res, next) => {
+    Vehicle.findById(req.params.id, (err, data) => {
+        if (err) res.json(err)
+        else res.json(data);
+    }).select('registrationNumber brand model numberOfSeats fuelType price -_id')
 }
 
 module.exports.reserve = (req, res) => {
@@ -74,9 +86,9 @@ module.exports.reserve = (req, res) => {
             reservation: req.body
         }
     },
-    (err,data)=>{
-        res.json(err ? err : data).status(err ? 500 : 200);
-    });
+        (err, data) => {
+            res.json(err ? err : data).status(err ? 500 : 200);
+        });
 }
 
 module.exports.updateVehicle = (req, res, next) => {

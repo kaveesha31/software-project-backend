@@ -52,6 +52,7 @@ const jwtHelper = require('../helpers/jwthelper');
 router.post('/register', ctrlUser.register);
 router.post('/authenticate', ctrlUser.authenticate);
 router.get('/userProfile', jwtHelper.verifyJwtToken, ctrlUser.userProfile);
+router.get('/user/:id', ctrlUser.getUserById);
 router.post('/verifyAccount', ctrlUser.verifyAccount);
 router.get('/displayUsers', ctrlUser.displayUsers);
 router.route('/deleteUser/:id').get(ctrlUser.deleteUser);
@@ -61,17 +62,20 @@ router.route('/oauth/facebook').post(passport.authenticate('facebookToken', { se
 //router.post('/sendEmail', ctrlMail.sendMail);
 
 //vehicle routes
+router.get('/vehicle/:id', ctrlVehicle.getVehicleById);
 router.post('/addVehicle', upload.single('productImage'), ctrlVehicle.addVehicle);
 router.get('/displayVehicle', ctrlVehicle.displayVehicle);
-router.get('/vehicle/all', ctrlVehicle.getAll)
+router.post('/vehicle/all', ctrlVehicle.getAll)
 router.route('/editVehicle/:id').get(ctrlVehicle.editVehicle);
-router.post('/updateVehicle/:id', upload.single('productImage'),ctrlVehicle.updateVehicle);
+router.post('/updateVehicle/:id', upload.single('productImage'), ctrlVehicle.updateVehicle);
 router.route('/deleteVehicle/:id').get(ctrlVehicle.deleteVehicle);
 // router.route('/file', upload.single('file')).post(ctrlVehicle.file);
 
 
 //reservation routes
-router.post('/vehicle/reserve/:id', ctrlVehicle.reserve)
+router.post('/vehicle/reserve', ctrlReservation.addReservation);
+router.get('/reservation/user/:id', ctrlReservation.getByUser);
+router.get('/reservation/old/user/:id', ctrlReservation.getOldByUser);
 
 router.post('/addReservation', ctrlReservation.addReservation);
 router.get('/displayReservation', ctrlReservation.displayReservation);

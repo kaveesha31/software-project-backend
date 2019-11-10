@@ -1,25 +1,30 @@
 const mongoose = require('mongoose');
 
 var reservationSchema = new mongoose.Schema({
-    reservingDate : {
-        type : String,
-        required : 'Reserving Date Number cannot be empty',
-        unique : true
+    from: {
+        type: Date
     },
-    returningDate : {
-        type : String,
-        required : 'Returning Date cannot be empty'
+    to: {
+        type: Date
     },
-    destination : {
-        type : String,
-        required : 'estination cannot be empty'
+    vehicle: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Vehicle"
     },
-    daysExpected : {
-        type : Number,
-        required : 'Days Expected Of Seats cannot be empty'
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    odoStart: {
+        type: Number
+    },
+    odoEnd: {
+        type: Number
+    },
+    completed: {
+        type: Boolean,
+        default: false
     }
-},{
-    collection: 'reservation'
 });
 
 mongoose.model('Reservation', reservationSchema);
