@@ -22,6 +22,12 @@ module.exports.register = (req, res, next) => {
     user.contactNumber = req.body.contactNumber;
     user.save((err, doc) => {
         if (!err) {
+            mailer.sendEmail(
+                'crental831@gmail.com',
+                'Welcome to CarRental',
+                doc.email,
+                'Please copy and paste following code to out application to verify your account. Code : ' + doc.randomCode
+            )
             res.send(doc);
         } else {
             if (err.code == 11000)
