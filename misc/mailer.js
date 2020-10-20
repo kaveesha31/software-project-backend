@@ -28,18 +28,6 @@ module.exports.mail = () => transport.sendMail(mailoptions, (err, data) => {
 })
 
 
-
-// // let transport = nodemailer.createTransport({
-// //     service : 'gmail',
-// //     auth : {
-// //         user : config.USER,
-// //         password : config.PASSWORD
-// //     },
-// //     tls : {
-// //         rejectUnauthorized : false
-// //     }
-// // });
-
 module.exports.sendEmail = (from, subject, to, text) => {
     transport.sendMail({ from: from, subject: subject, to: to, text: text }, (err, info) => {
         if (err) {

@@ -51,6 +51,14 @@ var vehicleSchema = new mongoose.Schema({
             type: Boolean,
             default: true
         }
+    },
+    rating : {
+        type: Number,
+        default: 0
+    },
+    total_rates : {
+        type: Number,
+        default: 0
     }
     // image : {data : Buffer, contentType : String}
 }, {

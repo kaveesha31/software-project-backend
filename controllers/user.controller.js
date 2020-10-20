@@ -13,6 +13,7 @@ const randomString = require('randomstring');
 //user registration
 module.exports.register = (req, res, next) => {
     var user = new User();
+    console.log(req.body)
     user.firstName = req.body.firstName;
     user.lastName = req.body.lastName;
     user.email = req.body.email;
@@ -28,13 +29,44 @@ module.exports.register = (req, res, next) => {
                 doc.email,
                 'Please copy and paste following code to out application to verify your account. Code : ' + doc.randomCode
             )
+            console.log('doc')
             res.send(doc);
         } else {
+            console.log(err);
             if (err.code == 11000)
                 res.status(422).send(['Duplicate email adrress found.']);
             else
                 // return next(err);
                 res.send('all the fields should be filled');
+        }
+        console.log('hello');
+    })
+}
+
+module.exports.getEmail = (req, res) => {
+    User.findOne({ email: req.body.email }, (err, doc) => {
+        if (err) res.json(err)
+        else
+            mailer.sendEmail(
+                'crental831@gmail.com',
+                'Welcome to CarRental',
+                doc.email,
+                'Please copy and paste following url to reset account password. URL : http://localhost:4200/reset-password?code=' + encodeURIComponent(doc.randomCode)
+            )
+        console.log('doc')
+        res.send(doc);
+    });
+}
+
+module.exports.resetPassword = (req, res) => {
+    console.log(decodeURIComponent(req.body.code))
+    User.findOne({ randomCode: req.body.code }, (err, doc) => {
+        if (err || !doc) res.status(500).json(err)
+        else {
+            doc.password = req.body.password;
+            doc.save((err, val) => {
+                res.json(val);
+            })
         }
     })
 }
@@ -70,7 +102,7 @@ module.exports.userProfile = (req, res, next) => {
             if (!user)
                 return res.status(404).json({ status: false, message: 'User record not found.' });
             else
-                return res.status(200).json({ status: true, user: _.pick(user, ['firstName', 'lastName', 'userName', 'email', 'city', 'contactNumber']) });
+                return res.status(200).json({ status: true, user: _.pick(user, ['firstName', 'lastName', 'userName', 'email', 'city', 'contactNumber', 'role', 'image']) });
         }
     );
 }
@@ -81,7 +113,7 @@ module.exports.getUserById = (req, res, next) => {
             if (!user)
                 return res.status(404).json({ status: false, message: 'User record not found.' });
             else
-                return res.status(200).json({ status: true, user: _.pick(user, ['firstName', 'lastName', 'userName', 'email', 'city', 'contactNumber']) });
+                return res.status(200).json({ status: true, user: _.pick(user, ['firstName', 'lastName', 'userName', 'email', 'city', 'contactNumber', 'role', 'image']) });
         }
     );
 }
@@ -122,7 +154,12 @@ module.exports.facebookLogin = (req, res, next) => {
 
 //display user
 module.exports.displayUsers = (req, res, next) => {
-    User.find((err, user) => {
+    User.find({
+        active: true,
+        role: {
+            $ne: "admin"
+        }
+    }, (err, user) => {
         if (err) {
             consolele.log('error');
         }
@@ -134,7 +171,11 @@ module.exports.displayUsers = (req, res, next) => {
 
 //delete user by admin side
 module.exports.deleteUser = (req, res, next) => {
-    User.findByIdAndRemove({ _id: req.params.id }, function (err, user) {
+    User.findByIdAndUpdate({ _id: req.params.id }, {
+        $set: {
+            active: false
+        }
+    }, function (err, user) {
         if (err) res.json(err);
         else res.json('Successfully removed');
     });
@@ -148,6 +189,19 @@ module.exports.editUserProfile = (req, res, next) => {
         res.json(user);
         console.log('user profile edit works');
     });
+}
+
+module.exports.updateImage = (req, res) => {
+    console.log('upload called')
+    const url = req.protocol + '://' + req.get('host')
+    User.findByIdAndUpdate(req.params.id, {
+        $set: {
+            image: url + '/public/' + req.file.filename
+        }
+    }, (err, data) => {
+        if (err) res.json(err)
+        else res.json(data)
+    })
 }
 
 //update user profile 

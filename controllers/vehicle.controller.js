@@ -64,12 +64,32 @@ module.exports.getAll = async (req, res, next) => {
     f.forEach(v => {
         vehicles.push(v.vehicle)
     })
+
+    query = {
+        _id: { $nin: vehicles },
+        $and : [
+            {
+                $or : [
+                    {
+                        brand: { "$regex": req.body.key, "$options": "i" }
+                    },
+                    {
+                        model: { "$regex": req.body.key, "$options": "i" }
+                    }
+                ]
+            }
+        ]
+    }
+
+    if(req.body.seats != -1){
+        query.$and.push({
+            numberOfSeats: req.body.seats
+        });
+    }
     console.log(vehicles)
-    Vehicle.find({
-        _id: { $nin: vehicles }
-    }, (err, val) => {
+    Vehicle.find(query, (err, val) => { 
         res.json(val);
-    })
+    }).sort({brand: 1})
 }
 
 

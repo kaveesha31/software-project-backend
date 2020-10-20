@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Reservation = mongoose.model('Reservation');
+const Vehicle = mongoose.model('Vehicle');
 
 //add reservation
 module.exports.addReservation = (req, res, next) => {
@@ -12,6 +13,50 @@ module.exports.addReservation = (req, res, next) => {
             // return next(err);
             res.json(err);
         }
+    });
+}
+
+module.exports.addRating = (req, res) => {
+    var reservation = new Reservation(req.body);
+    console.log(reservation.vehicle);
+    Reservation.findById(reservation._id, (err, reser) => {
+        console.log(reser)
+        if (reser) {
+            Vehicle.findById(reservation.vehicle, (err, doc) => {
+                if (err) console.log(err);
+                var new_rate = ((doc.rating * doc.total_rates) - reser.rating + reservation.rating) 
+                if (reser.rating === 0)
+                    doc.total_rates = doc.total_rates + 1;
+                new_rate /= doc.total_rates
+                console.log('reteeeeeeeeeeeeeeeeeeeeee')
+                console.log(new_rate)
+                doc.rating = Number(new_rate);
+
+                doc.save((err, dc) => {
+                    if (dc) {
+                        res.json(dc);
+                    } else {
+                        console.log(err)
+                        res.json(err)
+                    }
+                })
+                Reservation.findByIdAndUpdate(reservation._id, reservation, (err, dooo) => { });
+            });
+            //res.json(doc);
+        } else {
+            res.json(err);
+        }
+    });
+}
+
+module.exports.markAsCompleted = (req, res) => {
+    Reservation.findByIdAndUpdate(req.params.id, {
+        $set: {
+            completed: true
+        }
+    }, (err, data) => {
+        if (err) res.json(err)
+        else res.json(data)
     });
 }
 

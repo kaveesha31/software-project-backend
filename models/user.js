@@ -33,7 +33,7 @@ var userSchema = new mongoose.Schema({
         required : 'City cannot be empty'
     },
     contactNumber : {
-        type : Number,
+        type : String,
         required : 'Contact Number cannot be empty'
     },
     role : {
@@ -60,7 +60,8 @@ var userSchema = new mongoose.Schema({
     //     }
     //   },
     randomCode : String,
-    saltSecret : String
+    saltSecret : String,
+    image: String
 });
 
 // Custom validation for email

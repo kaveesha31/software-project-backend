@@ -40,6 +40,7 @@ router.post('/upload', upload.single('test'), (req, res, next) => {
 const Vehicle = require('../models/vehicle');
 
 const ctrlUser = require('../controllers/user.controller');
+const ctrlfeedback = require('../controllers/feedback.controller');
 const ctrlVehicle = require('../controllers/vehicle.controller');
 const ctrlReservation = require('../controllers/reservation.controller');
 const ctrlMail = require('../misc/mailer');
@@ -57,6 +58,10 @@ router.post('/verifyAccount', ctrlUser.verifyAccount);
 router.get('/displayUsers', ctrlUser.displayUsers);
 router.route('/deleteUser/:id').get(ctrlUser.deleteUser);
 router.route('/editUserProfile/:id').get(ctrlUser.editUserProfile);
+router.post('/getEmail', ctrlUser.getEmail);
+router.post('/resetPassword',ctrlUser.resetPassword);
+router.post('/updateProfileImage/:id', upload.single('image'), ctrlUser.updateImage)
+
 router.route('/updateUserProfile/:id').put(ctrlUser.updateUserProfile);
 router.route('/oauth/facebook').post(passport.authenticate('facebookToken', { session: false }), ctrlUser.facebookLogin);
 //router.post('/sendEmail', ctrlMail.sendMail);
@@ -76,16 +81,21 @@ router.route('/deleteVehicle/:id').get(ctrlVehicle.deleteVehicle);
 router.post('/vehicle/reserve', ctrlReservation.addReservation);
 router.get('/reservation/user/:id', ctrlReservation.getByUser);
 router.get('/reservation/old/user/:id', ctrlReservation.getOldByUser);
-
+router.post('/reservation/rate', ctrlReservation.addRating);
 router.post('/addReservation', ctrlReservation.addReservation);
 router.get('/displayReservation', ctrlReservation.displayReservation);
 router.route('/editReservation/:id').get(ctrlReservation.editReservation);
 router.route('/updateReservation/:id').put(ctrlReservation.updateReservation);
 router.route('/deleteReservation/:id').get(ctrlReservation.deleteReservation);
+router.get('/markAsCompleted/:id', ctrlReservation.markAsCompleted);
 // router.get('/getVehicle', ctrlVehicle.getVehicle);
 
 
-//file upload routes
+//feedback routes
+router.post('/feedback', ctrlfeedback.feedback);
+router.get('/displayFeedback', ctrlfeedback.displayFeedback);
+router.route('/deleteFeedback/:id').get(ctrlfeedback.deleteFeedback);
+router.get('/feedback/:id', ctrlfeedback.getFeedbackById);
 
 
 module.exports = router;

@@ -24,6 +24,10 @@ var reservationSchema = new mongoose.Schema({
     completed: {
         type: Boolean,
         default: false
+    },
+    rating: {
+        type: Number,
+        default: 0
     }
 });
 

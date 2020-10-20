@@ -12,3 +12,4 @@ require('./user');
 require('./vehicle');
 require('./facebookUsers');
 require('./reservation');
+require('./feedback');
